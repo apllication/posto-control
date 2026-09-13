@@ -1,4 +1,4 @@
-const CACHE = 'posto-control-v6';
+const CACHE = 'posto-control-v7';
 const ASSETS = [
   './', './controle-posto.html', './painel-gerente.html', './painel-supervisor.html', './administracao-supervisor.html', './gerentes-postos.html',
   './manifest-gerente.webmanifest', './manifest-supervisor.webmanifest', './icone-posto.svg'
