@@ -1,134 +1,24 @@
 <!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Posto Control — Vendas</title>
-  <meta name="theme-color" content="#102a43" />
-  <link rel="manifest" href="manifest-supervisor.webmanifest" />
-  <style>
-    :root { --navy:#102a43; --blue:#1479c9; --sky:#eaf5ff; --green:#0c8b68; --ink:#172b3a; --muted:#617487; --line:#dce6ef; --paper:#f6f9fc; --white:#fff; --danger:#c73b3b; }
-    * { box-sizing:border-box; }
-    body { margin:0; font:15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; color:var(--ink); background:var(--paper); }
-    button, input, select { font:inherit; }
-    .shell { max-width:1240px; margin:auto; padding:26px 20px 48px; }
-    header { display:flex; align-items:center; justify-content:space-between; gap:22px; margin-bottom:26px; }
-    .brand { display:flex; align-items:center; gap:12px; font-weight:800; color:var(--navy); letter-spacing:-.03em; font-size:21px; }
-    .mark { width:40px; height:40px; display:grid; place-items:center; border-radius:12px; color:#fff; background:linear-gradient(135deg,#169ce3,#0c8b68); font-size:22px; }
-    .role { color:var(--muted); font-size:13px; }
-    .tabs { display:flex; padding:5px; gap:4px; background:#e6eef5; border-radius:11px; }
-    .tabs button { border:0; background:transparent; color:var(--muted); border-radius:8px; padding:9px 14px; cursor:pointer; font-weight:700; }
-    .tabs button.active { color:var(--navy); background:var(--white); box-shadow:0 1px 4px #72849a33; }
-    .panel { display:none; } .panel.active { display:block; }
-    .hero { background:linear-gradient(108deg,#102a43,#164b76); color:#fff; border-radius:18px; padding:27px 30px; margin-bottom:20px; display:flex; align-items:end; justify-content:space-between; gap:20px; }
-    .hero h1 { margin:0 0 5px; font-size:28px; letter-spacing:-.04em; } .hero p { margin:0; color:#d9eafb; }
-    .hero .date { font-size:13px; color:#d9eafb; white-space:nowrap; }
-    .grid { display:grid; grid-template-columns:1.2fr .8fr; gap:20px; }
-    .card { background:var(--white); border:1px solid var(--line); border-radius:16px; padding:22px; }
-    h2 { margin:0 0 18px; color:var(--navy); font-size:18px; letter-spacing:-.02em; } h3 { margin:0; font-size:15px; color:var(--navy); }
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    label { display:grid; gap:6px; color:#43596d; font-size:13px; font-weight:700; }
-    input, select { width:100%; border:1px solid #cddae6; border-radius:9px; color:var(--ink); background:#fff; padding:10px 11px; outline:none; }
-    input:focus,select:focus { border-color:var(--blue); box-shadow:0 0 0 3px #1479c922; }
-    .wide { grid-column:1/-1; }
-    .actions { margin-top:18px; display:flex; justify-content:flex-end; gap:9px; }
-    .btn { border:0; border-radius:9px; padding:10px 14px; font-weight:800; cursor:pointer; } .btn.primary { color:#fff; background:var(--blue); } .btn.primary:hover { background:#0e68ae; }
-    .btn.text { color:var(--muted); background:#edf3f8; } .btn.remove { color:var(--danger); background:#fff0f0; padding:7px 9px; font-size:12px; }
-    .small-note { margin:16px 0 0; color:var(--muted); font-size:12px; }
-    .metric-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .metric { border-radius:12px; padding:16px; background:#f3f8fc; } .metric.green { background:#edf9f4; } .metric.blue { background:#eaf5ff; }
-    .metric span { display:block; color:var(--muted); font-size:12px; font-weight:700; } .metric strong { display:block; margin-top:6px; color:var(--navy); font-size:23px; letter-spacing:-.04em; }
-    .summary-list { display:grid; gap:13px; margin-top:20px; } .summary-row { display:flex; align-items:center; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--line); } .summary-row:last-child { border:0; padding:0; }
-    .summary-row span { color:var(--muted); } .summary-row b { color:var(--navy); }
-    .table-card { margin-top:20px; overflow:hidden; } .table-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:15px; }
-    .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; min-width:650px; } th { text-align:left; color:var(--muted); font-size:12px; padding:0 10px 10px; } td { padding:13px 10px; border-top:1px solid var(--line); } td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; } .station { font-weight:800; color:var(--navy); }
-    .station-card { margin-bottom:14px; padding:17px; border:1px solid var(--line); border-radius:12px; } .station-top { display:flex; justify-content:space-between; gap:10px; align-items:center; } .station-top span { font-size:12px; font-weight:700; color:var(--green); background:#e8f8f1; padding:4px 8px; border-radius:99px; }
-    .call-row { display:flex; justify-content:flex-end; margin-top:14px; } .btn.call { color:#fff; background:var(--green); padding:8px 11px; font-size:12px; } .btn.call:hover { background:#087255; }
-    .call-alert { display:none; align-items:center; justify-content:space-between; gap:15px; margin-bottom:20px; padding:14px 16px; border-radius:12px; color:#075d47; background:#e4f8ef; border:1px solid #a8e3cc; font-weight:700; } .call-alert.show { display:flex; } .call-alert small { display:block; margin-top:2px; color:#387366; font-weight:500; }
-    .bars { display:grid; gap:10px; margin-top:15px; } .bar-row { display:grid; grid-template-columns:110px 1fr auto; gap:8px; align-items:center; color:var(--muted); font-size:12px; } .track { height:7px; background:#e9eff4; border-radius:9px; overflow:hidden; } .fill { height:100%; background:var(--blue); border-radius:9px; } .fill.flex { background:var(--green); }
-    .empty { padding:30px; text-align:center; color:var(--muted); } .footer { margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
-    .login-screen { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:20px; background:linear-gradient(135deg,#0d2337cc,#164b76d9); } .login-box { width:min(100%,390px); padding:28px; border-radius:18px; background:#fff; box-shadow:0 20px 60px #00152d66; } .login-box .mark { margin-bottom:16px; } .login-box h1 { margin:0 0 7px; color:var(--navy); font-size:24px; } .login-box p { margin:0 0 22px; color:var(--muted); } .login-error { display:none; margin-top:12px; color:var(--danger); font-size:13px; font-weight:700; } .login-error.show { display:block; }
-    .save-message { display:none; margin-top:12px; color:var(--green); font-size:13px; font-weight:700; } .save-message.show { display:block; }
-    @media(max-width:800px) { header,.hero { align-items:flex-start; flex-direction:column; } .grid { grid-template-columns:1fr; } .metric-grid { grid-template-columns:1fr; } } @media(max-width:490px) { .shell{padding:18px 13px 35px}.form-grid{grid-template-columns:1fr}.hero{padding:22px}.hero h1{font-size:24px}.tabs{width:100%}.tabs button{flex:1;padding:9px 5px;font-size:13px} }
-  </style>
-</head>
-<body class="supervisor-app">
-  <section class="login-screen" id="login-screen" aria-label="Login do supervisor"><form class="login-box" id="login-form"><div class="mark">⛽</div><h1>Acesso do supervisor</h1><p>Entre para acompanhar e chamar os gerentes de todos os postos.</p><label>Usuário<input id="login-user" autocomplete="username" placeholder="Usuário" required></label><label style="margin-top:14px">Senha<input id="login-password" type="password" autocomplete="current-password" placeholder="Sua senha" required></label><button class="btn primary" style="margin-top:20px;width:100%" type="submit">Entrar no painel geral</button><div id="login-error" class="login-error">Usuário ou senha inválidos.</div></form></section>
-  <main class="shell">
-    <header>
-      <div class="brand"><div class="mark">⛽</div>Posto Control</div>
-      <div class="tabs" role="tablist" aria-label="Painéis">
-        <button class="active" data-tab="supervisor" role="tab" aria-selected="true">Painel do supervisor</button>
-      </div>
-      <div class="role">Acesso geral de supervisão</div>
-    </header>
-
-    <section id="manager" class="panel" hidden>
-      <div class="hero"><div><h1>Lançamento de vendas</h1><p>Informe as vendas do seu posto para o acompanhamento geral.</p></div><div class="date" id="today"></div></div>
-      <div class="call-alert" id="call-alert" role="alert"><div>🔔 O supervisor está chamando você.<small id="call-alert-detail"></small></div><button class="btn text" id="dismiss-call" type="button">Entendido</button></div>
-      <div class="grid">
-        <form class="card" id="sales-form">
-          <h2>Nova atualização</h2>
-          <div class="form-grid">
-            <label class="wide">Nome do posto<select id="station" required></select></label>
-            <label>Data<input id="sale-date" type="date" required></label>
-            <label>Gerente responsável<input id="manager-name" type="text" placeholder="Ex.: Ana Silva" required></label>
-            <label>Gasolina comum (litros)<input id="common" type="number" min="0" step="0.01" placeholder="0,00" required></label>
-            <label>Gasolina flex (litros)<input id="flex" type="number" min="0" step="0.01" placeholder="0,00" required></label>
-          </div>
-          <div class="actions"><button class="btn text" type="reset">Limpar</button><button class="btn primary" type="submit">Salvar vendas</button></div>
-          <p class="small-note">Os dados ficam separados por posto e entram automaticamente no painel do supervisor.</p>
-        </form>
-        <aside class="card"><h2>Resumo do posto selecionado</h2><div id="station-summary"></div></aside>
-      </div>
-      <section class="card table-card"><div class="table-head"><h2>Últimos lançamentos</h2><button class="btn text" id="demo-data" type="button">Carregar exemplo</button></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Posto</th><th>Gerente</th><th class="num">Comum</th><th class="num">Flex</th><th></th></tr></thead><tbody id="manager-table"></tbody></table></div></section>
-    </section>
-
-    <section id="supervisor" class="panel active">
-      <div class="hero"><div><h1>Visão geral de vendas</h1><p>Consolidação de todos os postos cadastrados.</p></div><div class="date">Atualizado em tempo real</div></div>
-      <section class="metric-grid" id="metrics"></section>
-      <section class="grid" style="margin-top:20px"><div class="card"><h2>Vendas por posto</h2><div id="station-cards"></div></div><div class="card"><h2>Consolidado geral</h2><div id="supervisor-summary"></div></div></section>
-      <section class="card table-card"><h2>Gerenciar acessos</h2><p class="small-note" style="margin-top:-10px;margin-bottom:16px">Preencha apenas as senhas que deseja alterar. Elas passam a valer no próximo login.</p><form id="access-form"><div class="form-grid"><label>Nova senha do supervisor<input id="supervisor-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha da Ana · Posto Centro<input id="ana-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha do Bruno · Posto Norte<input id="bruno-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha da Carla · Posto Sul<input id="carla-password" type="password" minlength="4" placeholder="Manter senha atual"></label></div><div class="actions"><button class="btn primary" type="submit">Salvar novas senhas</button></div><div class="save-message" id="save-message">Senhas atualizadas com sucesso.</div></form></section>
-      <section class="card table-card"><div class="table-head"><h2>Todos os lançamentos</h2><span class="small-note" id="record-count"></span></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Posto</th><th>Gerente</th><th class="num">Comum (L)</th><th class="num">Flex (L)</th><th class="num">Total (L)</th></tr></thead><tbody id="supervisor-table"></tbody></table></div></section>
-    </section>
-    <div class="footer">Posto Control · dados armazenados neste dispositivo</div>
-  </main>
-  <script>
-    const stations=['Posto Centro','Posto Norte','Posto Sul'];
-    const usersKey='posto-control-managers-v1', supervisorKey='posto-control-supervisor-password-v1';
-    const defaultManagers={ana:{name:'Ana Silva',station:'Posto Centro',password:'1234'},bruno:{name:'Bruno Costa',station:'Posto Norte',password:'1234'},carla:{name:'Carla Lima',station:'Posto Sul',password:'1234'}};
-    const key='posto-control-sales-v1', callKey='posto-control-manager-call-v1';
-    let records=JSON.parse(localStorage.getItem(key)||'[]');
-    const $=id=>document.getElementById(id); const fmt=n=>Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const formatDate=d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR');
-    function save(){localStorage.setItem(key,JSON.stringify(records));render();}
-    let notifiedCallId=null;
-    function beep(){try{const audio=new (window.AudioContext||window.webkitAudioContext)(),osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.setValueAtTime(880,audio.currentTime);gain.gain.setValueAtTime(.12,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.01,audio.currentTime+.45);osc.connect(gain).connect(audio.destination);osc.start();osc.stop(audio.currentTime+.45);}catch(e){}}
-    function showCall(call,notify=false){if(!call||call.status!=='pending'||call.station!==$('station').value)return;$('call-alert-detail').textContent=`Posto: ${call.station} · chamado às ${call.time}`;$('call-alert').classList.add('show');if(notify&&notifiedCallId!==call.id){notifiedCallId=call.id;beep();if(navigator.vibrate)navigator.vibrate([180,100,180]);}}
-    function checkWaitingCall(){showCall(JSON.parse(localStorage.getItem(callKey)||'null'),true);}
-    function callManager(station){const call={station,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),id:Date.now(),status:'pending'};localStorage.setItem(callKey,JSON.stringify(call));render();}
-    function stationTotals(name){return records.filter(r=>r.station===name).reduce((a,r)=>({common:a.common+Number(r.common),flex:a.flex+Number(r.flex)}),{common:0,flex:0});}
-    function render(){
-      const selected=$('station').value||stations[0], one=stationTotals(selected), all=records.reduce((a,r)=>({common:a.common+Number(r.common),flex:a.flex+Number(r.flex)}),{common:0,flex:0}), total=all.common+all.flex;
-      $('station-summary').innerHTML=`<div class="metric blue"><span>${selected}</span><strong>${fmt(one.common+one.flex)} L</strong></div><div class="summary-list"><div class="summary-row"><span>Gasolina comum</span><b>${fmt(one.common)} L</b></div><div class="summary-row"><span>Gasolina flex</span><b>${fmt(one.flex)} L</b></div><div class="summary-row"><span>Lançamentos</span><b>${records.filter(r=>r.station===selected).length}</b></div></div>`;
-      const rowHtml=records.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<tr><td>${formatDate(r.date)}</td><td class="station">${r.station}</td><td>${r.manager}</td><td class="num">${fmt(r.common)} L</td><td class="num">${fmt(r.flex)} L</td><td class="num"><button class="btn remove" data-remove="${r.id}">Excluir</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Nenhuma venda registrada ainda.</td></tr>';
-      $('manager-table').innerHTML=rowHtml;
-      $('metrics').innerHTML=`<div class="metric blue"><span>Total de vendas</span><strong>${fmt(total)} L</strong></div><div class="metric"><span>Gasolina comum</span><strong>${fmt(all.common)} L</strong></div><div class="metric green"><span>Gasolina flex</span><strong>${fmt(all.flex)} L</strong></div>`;
-      const maximum=Math.max(...stations.map(s=>{const x=stationTotals(s);return x.common+x.flex}),1);
-      const currentCall=JSON.parse(localStorage.getItem(callKey)||'null');
-      $('station-cards').innerHTML=stations.map(s=>{const x=stationTotals(s),sum=x.common+x.flex,isPending=currentCall&&currentCall.station===s&&currentCall.status==='pending',responded=currentCall&&currentCall.station===s&&currentCall.status==='responded';return `<article class="station-card"><div class="station-top"><h3>${s}</h3><span>${fmt(sum)} L</span></div><div class="bars"><div class="bar-row"><span>Comum</span><div class="track"><div class="fill" style="width:${(x.common/maximum)*100}%"></div></div><b>${fmt(x.common)} L</b></div><div class="bar-row"><span>Flex</span><div class="track"><div class="fill flex" style="width:${(x.flex/maximum)*100}%"></div></div><b>${fmt(x.flex)} L</b></div></div><div class="call-row"><button class="btn call" type="button" data-call="${s}">${isPending?'🔔 Aguardando gerente':responded?'✓ Gerente respondeu':'🔔 Chamar gerente'}</button></div></article>`}).join('');
-      $('supervisor-summary').innerHTML=`<div class="summary-list"><div class="summary-row"><span>Postos acompanhados</span><b>${stations.length}</b></div><div class="summary-row"><span>Gerentes que lançaram vendas</span><b>${new Set(records.map(r=>r.manager)).size}</b></div><div class="summary-row"><span>Total de registros</span><b>${records.length}</b></div><div class="summary-row"><span>Posto com maior venda</span><b>${stations.slice().sort((a,b)=>{let x=stationTotals(a),y=stationTotals(b);return(y.common+y.flex)-(x.common+x.flex)})[0]}</b></div></div>`;
-      $('supervisor-table').innerHTML=records.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<tr><td>${formatDate(r.date)}</td><td class="station">${r.station}</td><td>${r.manager}</td><td class="num">${fmt(r.common)}</td><td class="num">${fmt(r.flex)}</td><td class="num"><b>${fmt(Number(r.common)+Number(r.flex))}</b></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aguardando lançamentos dos gerentes.</td></tr>';
-      $('record-count').textContent=`${records.length} registro${records.length===1?'':'s'}`;
-    }
-    $('sales-form').addEventListener('submit',e=>{e.preventDefault();records.push({id:crypto.randomUUID(),station:$('station').value,date:$('sale-date').value,manager:$('manager-name').value.trim(),common:$('common').value,flex:$('flex').value});save();e.target.reset();$('sale-date').value=new Date().toISOString().slice(0,10);});
-    document.addEventListener('click',e=>{const id=e.target.dataset.remove;if(id){records=records.filter(r=>r.id!==id);save();}const station=e.target.dataset.call;if(station)callManager(station);});
-    $('station').addEventListener('change',()=>{render();checkWaitingCall();}); $('dismiss-call').addEventListener('click',()=>{const call=JSON.parse(localStorage.getItem(callKey)||'null');if(call&&call.station===$('station').value){call.status='responded';call.responseTime=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});localStorage.setItem(callKey,JSON.stringify(call));}$('call-alert').classList.remove('show');}); window.addEventListener('storage',e=>{if(e.key===callKey){showCall(JSON.parse(e.newValue||'null'),true);render();}}); $('demo-data').addEventListener('click',()=>{if(records.length&&!confirm('Substituir os dados atuais pelo exemplo?'))return; records=[{id:'1',station:'Posto Centro',date:'2026-09-12',manager:'Ana Silva',common:1250,flex:840},{id:'2',station:'Posto Norte',date:'2026-09-12',manager:'Bruno Costa',common:980,flex:1120},{id:'3',station:'Posto Sul',date:'2026-09-11',manager:'Carla Lima',common:760,flex:540}];save();});
-    document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',x===b)});document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));if(b.dataset.tab==='manager')checkWaitingCall();}));
-    $('station').innerHTML=stations.map(s=>`<option>${s}</option>`).join(''); $('sale-date').value=new Date().toISOString().slice(0,10); $('today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});render();
-    $('login-form').addEventListener('submit',e=>{e.preventDefault();const password=localStorage.getItem(supervisorKey)||'1234';if($('login-user').value.trim().toLowerCase()!=='supervisor'||$('login-password').value!==password){$('login-error').classList.add('show');return;}$('login-screen').style.display='none';});
-    $('access-form').addEventListener('submit',e=>{e.preventDefault();const managers=JSON.parse(localStorage.getItem(usersKey)||'null')||defaultManagers;['ana','bruno','carla'].forEach(user=>{const password=$(user+'-password').value;if(password)managers[user].password=password;});const supervisorPassword=$('supervisor-password').value;if(supervisorPassword)localStorage.setItem(supervisorKey,supervisorPassword);localStorage.setItem(usersKey,JSON.stringify(managers));e.target.reset();$('save-message').classList.add('show');});
-    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-  </script>
-</body>
-</html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Posto Control — Supervisor</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><style>
+:root{--navy:#102a43;--blue:#1479c9;--green:#0c8b68;--ink:#172b3a;--muted:#617487;--line:#dce6ef;--paper:#f6f9fc;--white:#fff;--danger:#c73b3b}*{box-sizing:border-box}body{margin:0;font:15px/1.45 system-ui,sans-serif;color:var(--ink);background:var(--paper)}.shell{max-width:1200px;margin:auto;padding:24px 18px 45px}.brand{font-weight:800;color:var(--navy);font-size:21px;margin-bottom:22px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}.hero{background:linear-gradient(108deg,#102a43,#164b76);color:#fff;border-radius:18px;padding:25px;margin-bottom:18px}.hero h1{margin:0 0 5px}.hero p{margin:0;color:#d9eafb}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.form{display:grid;gap:13px}label{display:grid;gap:6px;font-weight:700;font-size:13px;color:#43596d}input,select{width:100%;padding:10px;border:1px solid #cddae6;border-radius:9px;font:inherit}.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#edf3f8;color:var(--muted)}.green{background:var(--green);color:#fff}.actions{display:flex;gap:9px;justify-content:flex-end}.login{max-width:390px;margin:10vh auto}.msg{margin-top:10px;font-weight:700}.ok{color:var(--green)}.err{color:var(--danger)}.muted{color:var(--muted);font-size:12px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{padding:15px;border-radius:12px;background:#f3f8fc}.metric b{display:block;font-size:22px;color:var(--navy);margin-top:4px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px 8px;border-top:1px solid var(--line)}th{color:var(--muted);font-size:12px}.num{text-align:right}.hidden{display:none}.manager{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}.manager strong{color:var(--navy)}@media(max-width:760px){.grid,.metrics{grid-template-columns:1fr}.actions{flex-wrap:wrap}}
+</style></head><body>
+<section id="login" class="login card"><div class="brand">⛽ Posto Control</div><h1>Acesso do supervisor</h1><p class="muted">Entre para administrar os postos e os gerentes.</p><form id="loginForm" class="form"><label>Usuário<input id="username" autocomplete="username" required></label><label>Senha<input id="password" type="password" autocomplete="current-password" required></label><button class="btn primary">Entrar</button></form><div id="loginMsg" class="msg err"></div></section>
+<main id="app" class="shell hidden"><div class="brand">⛽ Posto Control <button id="logout" class="btn secondary" style="float:right">Sair</button></div>
+<div class="hero"><h1>Painel do supervisor</h1><p>Controle online de gerentes, vendas e chamados.</p></div>
+<div class="grid"><section class="card"><h2>Cadastrar gerente</h2><form id="managerForm" class="form"><label>Nome completo<input id="fullName" required placeholder="Ex.: João Silva"></label><label>Usuário de acesso<input id="managerUser" required placeholder="Ex.: joao"></label><label>Senha inicial<input id="managerPass" type="password" minlength="6" required></label><label>Posto<select id="managerStation" required><option>Posto Centro</option><option>Posto Norte</option><option>Posto Sul</option></select></label><div class="actions"><button class="btn primary">Cadastrar gerente</button></div></form><div id="managerMsg" class="msg"></div></section>
+<section class="card"><h2>Gerentes cadastrados</h2><div id="managers"></div></section></div>
+<section class="card"><h2>Resumo geral</h2><div id="metrics" class="metrics"></div></section>
+<section class="card"><h2>Vendas por posto</h2><div style="overflow:auto"><table><thead><tr><th>Data</th><th>Posto</th><th>Gerente</th><th class="num">Comum</th><th class="num">Flex</th><th class="num">Total</th></tr></thead><tbody id="salesTable"></tbody></table></div></section>
+<section class="card"><h2>Chamar gerente</h2><p class="muted">O gerente recebe o aviso no painel dele em tempo real.</p><div class="actions"><button class="btn green" onclick="callManager('Posto Centro')">Chamar Centro</button><button class="btn green" onclick="callManager('Posto Norte')">Chamar Norte</button><button class="btn green" onclick="callManager('Posto Sul')">Chamar Sul</button></div><div id="callMsg" class="msg"></div></section>
+</main>
+<script>
+const stations=['Posto Centro','Posto Norte','Posto Sul'];let profile=null,sales=[];const $=id=>document.getElementById(id);function br(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}function msg(el,t,ok=false){el.textContent=t;el.className='msg '+(ok?'ok':'err')}
+window.PostoControl={client:window.supabase.createClient(window.POSTO_CONTROL_SUPABASE.url,window.POSTO_CONTROL_SUPABASE.publishableKey),emailFor:u=>String(u).trim().toLowerCase()+'@posto-control.local',async login(u,p){const {data,error}=await this.client.auth.signInWithPassword({email:this.emailFor(u),password:p});if(error)throw error;const {data:profile,error:pe}=await this.client.from('profiles').select('*').eq('id',data.user.id).single();if(pe)throw pe;return profile},async session(){const {data}=await this.client.auth.getSession();return data.session},async profile(){const s=await this.session();if(!s)return null;const {data,error}=await this.client.from('profiles').select('*').eq('id',s.user.id).single();if(error)throw error;return data},async logout(){await this.client.auth.signOut()},async createManager(payload){const {data,error}=await this.client.functions.invoke('create-manager',{body:payload});if(error)throw error;if(data?.error)throw new Error(data.error);return data.manager},async managers(){const {data,error}=await this.client.from('profiles').select('*').eq('role','manager').order('full_name');if(error)throw error;return data||[]},async sales(){const {data,error}=await this.client.from('sales').select('*').order('sale_date',{ascending:false});if(error)throw error;return data||[]},async calls(){const {data,error}=await this.client.from('manager_calls').select('*').order('created_at',{ascending:false});if(error)throw error;return data||[]},async callManager(station){const {data,error}=await this.client.from('manager_calls').insert({station,status:'pending'}).select().single();if(error)throw error;return data},subscribeSales(cb){return this.client.channel('sales-supervisor').on('postgres_changes',{event:'*',schema:'public',table:'sales'},cb).subscribe()}};
+async function load(){const [m,s]=await Promise.all([PostoControl.managers(),PostoControl.sales()]);sales=s;renderManagers(m);renderSales()}
+function renderManagers(ms){$('managers').innerHTML=ms.length?ms.map(m=>`<div class="manager"><strong>${m.full_name}</strong><div class="muted">Usuário: ${m.username} · ${m.station}</div></div>`).join(''):'<div class="muted">Nenhum gerente cadastrado.</div>'}
+function renderSales(){const common=sales.reduce((a,r)=>a+Number(r.common_liters||0),0),flex=sales.reduce((a,r)=>a+Number(r.flex_liters||0),0);$('metrics').innerHTML=`<div class="metric"><span>Comum</span><b>${br(common)} L</b></div><div class="metric"><span>Flex</span><b>${br(flex)} L</b></div><div class="metric"><span>Total</span><b>${br(common+flex)} L</b></div>`;if(!sales.length){$('salesTable').innerHTML='<tr><td colspan="6">Nenhuma venda registrada.</td></tr>';return}$('salesTable').innerHTML=sales.map(r=>`<tr><td>${new Date(r.sale_date+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>${r.station}</td><td>${r.manager_id.slice(0,8)}</td><td class="num">${br(r.common_liters)} L</td><td class="num">${br(r.flex_liters)} L</td><td class="num">${br(Number(r.common_liters||0)+Number(r.flex_liters||0))} L</td></tr>`).join('')}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginMsg').textContent='Entrando...';try{const p=await PostoControl.login($('username').value,$('password').value);if(p.role!=='supervisor')throw new Error('Esta conta não é de supervisor.');profile=p;$('login').classList.add('hidden');$('app').classList.remove('hidden');await load();PostoControl.subscribeSales(load)}catch(e){msg($('loginMsg'),e.message||'Usuário ou senha inválidos.')}};
+$('managerForm').onsubmit=async e=>{e.preventDefault();try{const manager=await PostoControl.createManager({username:$('managerUser').value,full_name:$('fullName').value,password:$('managerPass').value,station:$('managerStation').value});msg($('managerMsg'),`Gerente ${manager.full_name} cadastrado com sucesso.`,true);$('managerForm').reset();await load()}catch(e){msg($('managerMsg'),e.message||'Não foi possível cadastrar o gerente.')}};
+window.callManager=async station=>{try{await PostoControl.callManager(station);msg($('callMsg'),`Chamado enviado para ${station}.`,true)}catch(e){msg($('callMsg'),e.message||'Não foi possível chamar o gerente.')}};$('logout').onclick=async()=>{await PostoControl.logout();location.reload()};
+(async()=>{try{const s=await PostoControl.session();if(s){const p=await PostoControl.profile();if(p?.role==='supervisor'){profile=p;$('login').classList.add('hidden');$('app').classList.remove('hidden');await load()}}}catch(e){}})();
+</script></body></html>
