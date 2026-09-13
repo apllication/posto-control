@@ -30,6 +30,12 @@ create table if not exists public.manager_calls (
   responded_at timestamptz
 );
 
+create table if not exists public.app_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz not null default now()
+);
+
 create or replace function public.is_supervisor()
 returns boolean
 language sql
@@ -56,11 +62,13 @@ $$;
 alter table public.profiles enable row level security;
 alter table public.sales enable row level security;
 alter table public.manager_calls enable row level security;
+alter table public.app_settings enable row level security;
 
-revoke all on table public.profiles, public.sales, public.manager_calls from anon;
+revoke all on table public.profiles, public.sales, public.manager_calls, public.app_settings from anon;
 grant select on table public.profiles to authenticated;
 grant select, insert, update, delete on table public.sales to authenticated;
 grant select, insert, update on table public.manager_calls to authenticated;
+grant select, insert, update on table public.app_settings to authenticated;
 
 drop policy if exists "profiles own or supervisor" on public.profiles;
 create policy "profiles own or supervisor"
@@ -106,6 +114,26 @@ create policy "supervisor updates calls"
 on public.manager_calls for update to authenticated
 using (public.is_supervisor() or station = public.my_station())
 with check (public.is_supervisor() or station = public.my_station());
+
+drop policy if exists "settings authenticated read" on public.app_settings;
+create policy "settings authenticated read"
+on public.app_settings for select to authenticated
+using (true);
+
+drop policy if exists "settings supervisor write" on public.app_settings;
+create policy "settings supervisor write"
+on public.app_settings for insert to authenticated
+with check (public.is_supervisor());
+
+drop policy if exists "settings supervisor update" on public.app_settings;
+create policy "settings supervisor update"
+on public.app_settings for update to authenticated
+using (public.is_supervisor())
+with check (public.is_supervisor());
+
+insert into public.app_settings(key,value)
+values ('submission_deadline','18:00')
+on conflict (key) do nothing;
 
 create index if not exists sales_manager_id_idx on public.sales(manager_id);
 create index if not exists sales_station_date_idx on public.sales(station, sale_date desc);
