@@ -1,0 +1,43 @@
+{
+  "name": "posto-argb-control",
+  "version": "1.0.0",
+  "description": "Posto ARGB Control - MSI MAG B550 TOMAHAWK / JRAINBOW / OpenRGB SDK",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win nsis",
+    "release": "electron-builder --win nsis --publish always"
+  },
+  "devDependencies": {
+    "electron": "^38.1.0",
+    "electron-builder": "^27.0.0"
+  },
+  "dependencies": {
+    "electron-updater": "^7.0.0"
+  },
+  "build": {
+    "appId": "br.posto.argb.control",
+    "productName": "Posto ARGB Control",
+    "artifactName": "Posto-ARGB-Control-Setup-${version}.${ext}",
+    "asar": true,
+    "files": ["**/*", "!README.md"],
+    "directories": {"output": "dist"},
+    "win": {
+      "target": [{"target": "nsis", "arch": ["x64"]}],
+      "verifyUpdateCodeSignature": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Posto ARGB Control"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "apllication",
+      "repo": "posto-control",
+      "releaseType": "release"
+    }
+  }
+}
