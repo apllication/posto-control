@@ -1,0 +1,10 @@
+{
+  "name": "Posto Control — Supervisor",
+  "short_name": "Posto Supervisor",
+  "start_url": "painel-supervisor.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f9fc",
+  "theme_color": "#102a43",
+  "icons": [{"src":"icone-posto.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Posto Control — Vendas</title>
+  <meta name="theme-color" content="#102a43" />
+  <link rel="manifest" href="manifest-supervisor.webmanifest" />
   <style>
     :root { --navy:#102a43; --blue:#1479c9; --sky:#eaf5ff; --green:#0c8b68; --ink:#172b3a; --muted:#617487; --line:#dce6ef; --paper:#f6f9fc; --white:#fff; --danger:#c73b3b; }
     * { box-sizing:border-box; }
@@ -46,6 +48,7 @@
     .bars { display:grid; gap:10px; margin-top:15px; } .bar-row { display:grid; grid-template-columns:110px 1fr auto; gap:8px; align-items:center; color:var(--muted); font-size:12px; } .track { height:7px; background:#e9eff4; border-radius:9px; overflow:hidden; } .fill { height:100%; background:var(--blue); border-radius:9px; } .fill.flex { background:var(--green); }
     .empty { padding:30px; text-align:center; color:var(--muted); } .footer { margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
     .login-screen { position:fixed; inset:0; z-index:10; display:grid; place-items:center; padding:20px; background:linear-gradient(135deg,#0d2337cc,#164b76d9); } .login-box { width:min(100%,390px); padding:28px; border-radius:18px; background:#fff; box-shadow:0 20px 60px #00152d66; } .login-box .mark { margin-bottom:16px; } .login-box h1 { margin:0 0 7px; color:var(--navy); font-size:24px; } .login-box p { margin:0 0 22px; color:var(--muted); } .login-error { display:none; margin-top:12px; color:var(--danger); font-size:13px; font-weight:700; } .login-error.show { display:block; }
+    .save-message { display:none; margin-top:12px; color:var(--green); font-size:13px; font-weight:700; } .save-message.show { display:block; }
     @media(max-width:800px) { header,.hero { align-items:flex-start; flex-direction:column; } .grid { grid-template-columns:1fr; } .metric-grid { grid-template-columns:1fr; } } @media(max-width:490px) { .shell{padding:18px 13px 35px}.form-grid{grid-template-columns:1fr}.hero{padding:22px}.hero h1{font-size:24px}.tabs{width:100%}.tabs button{flex:1;padding:9px 5px;font-size:13px} }
   </style>
 </head>
@@ -85,12 +88,15 @@
       <div class="hero"><div><h1>Visão geral de vendas</h1><p>Consolidação de todos os postos cadastrados.</p></div><div class="date">Atualizado em tempo real</div></div>
       <section class="metric-grid" id="metrics"></section>
       <section class="grid" style="margin-top:20px"><div class="card"><h2>Vendas por posto</h2><div id="station-cards"></div></div><div class="card"><h2>Consolidado geral</h2><div id="supervisor-summary"></div></div></section>
+      <section class="card table-card"><h2>Gerenciar acessos</h2><p class="small-note" style="margin-top:-10px;margin-bottom:16px">Preencha apenas as senhas que deseja alterar. Elas passam a valer no próximo login.</p><form id="access-form"><div class="form-grid"><label>Nova senha do supervisor<input id="supervisor-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha da Ana · Posto Centro<input id="ana-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha do Bruno · Posto Norte<input id="bruno-password" type="password" minlength="4" placeholder="Manter senha atual"></label><label>Nova senha da Carla · Posto Sul<input id="carla-password" type="password" minlength="4" placeholder="Manter senha atual"></label></div><div class="actions"><button class="btn primary" type="submit">Salvar novas senhas</button></div><div class="save-message" id="save-message">Senhas atualizadas com sucesso.</div></form></section>
       <section class="card table-card"><div class="table-head"><h2>Todos os lançamentos</h2><span class="small-note" id="record-count"></span></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Posto</th><th>Gerente</th><th class="num">Comum (L)</th><th class="num">Flex (L)</th><th class="num">Total (L)</th></tr></thead><tbody id="supervisor-table"></tbody></table></div></section>
     </section>
     <div class="footer">Posto Control · dados armazenados neste dispositivo</div>
   </main>
   <script>
     const stations=['Posto Centro','Posto Norte','Posto Sul'];
+    const usersKey='posto-control-managers-v1', supervisorKey='posto-control-supervisor-password-v1';
+    const defaultManagers={ana:{name:'Ana Silva',station:'Posto Centro',password:'1234'},bruno:{name:'Bruno Costa',station:'Posto Norte',password:'1234'},carla:{name:'Carla Lima',station:'Posto Sul',password:'1234'}};
     const key='posto-control-sales-v1', callKey='posto-control-manager-call-v1';
     let records=JSON.parse(localStorage.getItem(key)||'[]');
     const $=id=>document.getElementById(id); const fmt=n=>Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -120,7 +126,9 @@
     $('station').addEventListener('change',()=>{render();checkWaitingCall();}); $('dismiss-call').addEventListener('click',()=>{const call=JSON.parse(localStorage.getItem(callKey)||'null');if(call&&call.station===$('station').value){call.status='responded';call.responseTime=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});localStorage.setItem(callKey,JSON.stringify(call));}$('call-alert').classList.remove('show');}); window.addEventListener('storage',e=>{if(e.key===callKey){showCall(JSON.parse(e.newValue||'null'),true);render();}}); $('demo-data').addEventListener('click',()=>{if(records.length&&!confirm('Substituir os dados atuais pelo exemplo?'))return; records=[{id:'1',station:'Posto Centro',date:'2026-09-12',manager:'Ana Silva',common:1250,flex:840},{id:'2',station:'Posto Norte',date:'2026-09-12',manager:'Bruno Costa',common:980,flex:1120},{id:'3',station:'Posto Sul',date:'2026-09-11',manager:'Carla Lima',common:760,flex:540}];save();});
     document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',x===b)});document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));if(b.dataset.tab==='manager')checkWaitingCall();}));
     $('station').innerHTML=stations.map(s=>`<option>${s}</option>`).join(''); $('sale-date').value=new Date().toISOString().slice(0,10); $('today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});render();
-    $('login-form').addEventListener('submit',e=>{e.preventDefault();if($('login-user').value.trim().toLowerCase()!=='supervisor'||$('login-password').value!=='1234'){$('login-error').classList.add('show');return;}$('login-screen').style.display='none';});
+    $('login-form').addEventListener('submit',e=>{e.preventDefault();const password=localStorage.getItem(supervisorKey)||'1234';if($('login-user').value.trim().toLowerCase()!=='supervisor'||$('login-password').value!==password){$('login-error').classList.add('show');return;}$('login-screen').style.display='none';});
+    $('access-form').addEventListener('submit',e=>{e.preventDefault();const managers=JSON.parse(localStorage.getItem(usersKey)||'null')||defaultManagers;['ana','bruno','carla'].forEach(user=>{const password=$(user+'-password').value;if(password)managers[user].password=password;});const supervisorPassword=$('supervisor-password').value;if(supervisorPassword)localStorage.setItem(supervisorKey,supervisorPassword);localStorage.setItem(usersKey,JSON.stringify(managers));e.target.reset();$('save-message').classList.add('show');});
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
   </script>
 </body>
 </html>

@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Posto Control — Vendas</title>
+  <meta name="theme-color" content="#102a43" />
+  <link rel="manifest" href="manifest-gerente.webmanifest" />
   <style>
     :root { --navy:#102a43; --blue:#1479c9; --sky:#eaf5ff; --green:#0c8b68; --ink:#172b3a; --muted:#617487; --line:#dce6ef; --paper:#f6f9fc; --white:#fff; --danger:#c73b3b; }
     * { box-sizing:border-box; }
@@ -91,7 +93,8 @@
   </main>
   <script>
     const stations=['Posto Centro','Posto Norte','Posto Sul'];
-    const managers={ana:{name:'Ana Silva',station:'Posto Centro',password:'1234'},bruno:{name:'Bruno Costa',station:'Posto Norte',password:'1234'},carla:{name:'Carla Lima',station:'Posto Sul',password:'1234'}};
+    const defaultManagers={ana:{name:'Ana Silva',station:'Posto Centro',password:'1234'},bruno:{name:'Bruno Costa',station:'Posto Norte',password:'1234'},carla:{name:'Carla Lima',station:'Posto Sul',password:'1234'}};
+    const managers=JSON.parse(localStorage.getItem('posto-control-managers-v1')||'null')||defaultManagers;
     const key='posto-control-sales-v1', callKey='posto-control-manager-call-v1';
     let records=JSON.parse(localStorage.getItem(key)||'[]'); let signedManager=null;
     const $=id=>document.getElementById(id); const fmt=n=>Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -122,6 +125,7 @@
     document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',x===b)});document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab));if(b.dataset.tab==='manager')checkWaitingCall();}));
     $('station').innerHTML=stations.map(s=>`<option>${s}</option>`).join(''); $('sale-date').value=new Date().toISOString().slice(0,10); $('today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});render();
     $('login-form').addEventListener('submit',e=>{e.preventDefault();const user=$('login-user').value.trim().toLowerCase(),manager=managers[user];if(!manager||$('login-password').value!==manager.password){$('login-error').classList.add('show');return;}signedManager=manager;$('station').value=manager.station;$('station').disabled=true;$('manager-name').value=manager.name;$('manager-name').readOnly=true;$('logged-manager').textContent=`${manager.name} · ${manager.station}`;$('login-screen').style.display='none';render();checkWaitingCall();});
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
   </script>
 </body>
 </html>
