@@ -36,6 +36,22 @@ create table if not exists public.app_settings (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  manager_id uuid not null references public.profiles(id) on delete cascade,
+  station text not null,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.push_config (
+  key text primary key,
+  value text not null
+);
+
 create or replace function public.is_supervisor()
 returns boolean
 language sql
@@ -63,12 +79,16 @@ alter table public.profiles enable row level security;
 alter table public.sales enable row level security;
 alter table public.manager_calls enable row level security;
 alter table public.app_settings enable row level security;
+alter table public.push_subscriptions enable row level security;
+alter table public.push_config enable row level security;
 
 revoke all on table public.profiles, public.sales, public.manager_calls, public.app_settings from anon;
 grant select on table public.profiles to authenticated;
 grant select, insert, update, delete on table public.sales to authenticated;
 grant select, insert, update on table public.manager_calls to authenticated;
 grant select, insert, update on table public.app_settings to authenticated;
+grant select, insert, update, delete on table public.push_subscriptions to authenticated;
+revoke all on table public.push_config from anon, authenticated;
 
 drop policy if exists "profiles own or supervisor" on public.profiles;
 create policy "profiles own or supervisor"
@@ -131,6 +151,12 @@ on public.app_settings for update to authenticated
 using (public.is_supervisor())
 with check (public.is_supervisor());
 
+drop policy if exists "managers own push subscriptions" on public.push_subscriptions;
+create policy "managers own push subscriptions"
+on public.push_subscriptions for all to authenticated
+using (manager_id = auth.uid())
+with check (manager_id = auth.uid());
+
 insert into public.app_settings(key,value)
 values ('submission_deadline','18:00')
 on conflict (key) do nothing;
@@ -138,6 +164,8 @@ on conflict (key) do nothing;
 create index if not exists sales_manager_id_idx on public.sales(manager_id);
 create index if not exists sales_station_date_idx on public.sales(station, sale_date desc);
 create index if not exists calls_station_created_idx on public.manager_calls(station, created_at desc);
+create index if not exists push_subscriptions_manager_id_idx on public.push_subscriptions(manager_id);
+create index if not exists push_subscriptions_station_idx on public.push_subscriptions(station);
 
 alter publication supabase_realtime add table public.sales;
 alter publication supabase_realtime add table public.manager_calls;
